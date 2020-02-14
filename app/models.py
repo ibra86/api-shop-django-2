@@ -1,15 +1,9 @@
-from django.db.models import Model, CharField, EmailField, DecimalField, DO_NOTHING, TextField, ManyToManyField, \
-    ForeignKey, OneToOneField, CASCADE, IntegerField
+from django.db.models import Model, CharField, DecimalField, DO_NOTHING, TextField, ManyToManyField, \
+    ForeignKey, IntegerField
 
 from users.models import CustomUser
 
 MAX_NAME_LENGTH = 80
-
-
-class User(Model):
-    user = OneToOneField(CustomUser, on_delete=CASCADE)
-    name = CharField(max_length=MAX_NAME_LENGTH)
-    email = EmailField(null=True)
 
 
 class Shop(Model):
@@ -21,7 +15,7 @@ class Shop(Model):
         return self.name
 
 
-class Item(Model):
+class Product(Model):
     name = CharField(max_length=MAX_NAME_LENGTH)
     price = DecimalField(max_digits=6, decimal_places=2)
     category = CharField(max_length=MAX_NAME_LENGTH, blank=True)
@@ -32,11 +26,17 @@ class Item(Model):
         return self.name
 
 
+# class User(Model):
+#     user = OneToOneField(CustomUser, on_delete=CASCADE)
+
 class Basket(Model):
-    user_id = ForeignKey(User, on_delete=DO_NOTHING)
-    item = ManyToManyField(Item)
-    quantity = IntegerField()
+    user_id = ForeignKey(CustomUser, on_delete=DO_NOTHING)
+    item = ManyToManyField(Product, blank=True, default=None)
+    quantity = IntegerField(default=0)
+
+    @property
+    def get_quantity_value(self):
+        return self.quantity
 
     def __str__(self):
-        return self.name
-
+        return f'Basket with {self.get_quantity_value} items'
