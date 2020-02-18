@@ -105,5 +105,7 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'users.CustomUser'  # new
 
+LOGIN_URL = '/users/login/'
+
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'

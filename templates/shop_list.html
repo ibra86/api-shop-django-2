@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Shops{% endblock %}
+
+{% block content %}
+    <h2>All shops</h2>
+    <ol>
+        {% for object in objects %}
+            <a class=" list-group-item list-group-item-action"
+               href="{% url 'shop-detail' pk=object.id %}">
+{#               href="#">#}
+                <li>
+                    id: {{ object.id }},
+                    name: {{ object.name }},
+                    city: {{ object.city }},
+                    owner: {{ object.owner }}
+                </li>
+            </a>
+        {% empty %}
+            No shops yet
+        {% endfor %}
+    </ol>
+    <div><a href="{% url 'shop-create' %}">Add shop</a></div>
+{% endblock %}

@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Products{% endblock %}
+
+{% block content %}
+    <h2>All products</h2>
+    <ol>
+        {% for object in objects %}
+            <li>
+                id: {{ object.id }},
+                name: {{ object.name }},
+                price: {{ object.price }},
+                category: {{ object.category }},
+                description: {{ object.description }}
+            </li>
+        {% empty %}
+            No products yet
+        {% endfor %}
+    </ol>
+    <div><a href="{% url 'product-create' %}">Add product</a></div>
+{% endblock %}

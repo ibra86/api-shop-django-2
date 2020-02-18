@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Shops{% endblock %}
+
+{% block content %}
+    <p>{{ object.id }} -- {{ object }}</p>
+    {% for product_item in product_shop_items %}
+        <li>
+            {{ product_item }}
+        </li>
+    {% empty %}
+        No products in the shop yet
+    {% endfor %}
+    <div><a href="{% url 'product-shop-item-create' %}">Add product to the shop</a></div>
+{% endblock %}
