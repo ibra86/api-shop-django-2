@@ -11,5 +11,5 @@
     {% empty %}
         No products in the shop yet
     {% endfor %}
-    <div><a href="{% url 'product-shop-item-create' %}">Add product to the shop</a></div>
+    <div><a href="{% url 'product-shop-item-create' pk=object.id%}">Add product to the shop</a></div>
 {% endblock %}

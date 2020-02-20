@@ -4,9 +4,17 @@
 
 {% block content %}
     <h2>Add product</h2>
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>This product is already in shop</strong>
+        </div>
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Add</button>
     </form>
+{#    {{ object }}#}
+    <div><a href="{% url 'shop-detail' pk=shop_id%}">Go back to shop {{ shop_id }}</a></div>
 {% endblock %}

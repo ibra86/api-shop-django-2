@@ -1,15 +1,16 @@
 from django.forms import ModelForm
 
-from app.models import ProductShopItem
+from app.models import ProductShopItem, Shop
 
 
 class ProductShopItemCreateForm(ModelForm):
-    ...
-#     class Meta:
-#         model = ProductShopItem
-#         fields = ('product',)
-#
-#     def __init__(self, *args, **kwargs):
-#         self.shop = kwargs.pop('shop')
-#         super().__init__(*args, **kwargs)
-#         self.fields['product'].queryset = self.model.objects.filter(user='shop')
+    class Meta:
+        model = ProductShopItem
+        fields = '__all__'
+
+    # def is_valid(self):
+    #     # product_item = self.cleaned_data.get('product_item')
+    #     # shops = self.cleaned_data.get('shops')
+    #     # self.Meta.model.objects.all()
+    #     return super().is_valid()
+

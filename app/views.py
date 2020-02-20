@@ -14,8 +14,12 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
-            basket = Basket(user_id=self.request.user)
-            basket.save()
+            # TODO
+            # Basket.objects.filter(user=self.request.user).exists()
+            # basket = Basket(user=self.request.user)
+            # # basket = Basket.objects.filter(user=self.request.user)
+            # basket.save()
+            basket = 0
             context['basket'] = basket
         return context
 
@@ -32,7 +36,7 @@ class ShopDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_shop_items'] = ProductShopItem.objects.filter(shop_id=self.kwargs.get('pk'))
+        context['product_shop_items'] = ProductShopItem.objects.filter(shops__id=self.kwargs.get('pk'))
         return context
 
 
@@ -65,18 +69,36 @@ class ProductCreateView(CreateView):
 
 
 class ProductShopItemCreateView(CreateView):
-    ...
-    # # model = ProductShopItem
-    # # fields = '__all__'
-    # form_class = ProductShopItemCreateForm
-    #
-    # # def get_form_kwargs(self):
-    # #     kwargs = super(FolderCreate, self).get_form_kwargs()
-    # #     kwargs['user'] = self.request.user
-    # #     return kwargs
-    #
-    # # success_url = reverse_lazy('shop-detail')
-    # template_name = 'product_shop_item_create.html'
-    # #
-    # # def get_success_url(self):
-    # #     return reverse_lazy('shop-detail', kwargs={'pk': self.object.pk})
+    form_class = ProductShopItemCreateForm
+    template_name = 'product_shop_item_create.html'
+
+    # success_url = reverse_lazy('shop-list')
+
+    # def get_form_kwargs(self):
+    #     kwargs = super().get_form_kwargs()
+    #     kwargs['shop_id'] = self.request.resolver_match.kwargs.get('pk')
+    #     return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        shop_id = self.kwargs.get('pk')
+        initial.update({'shops': Shop.objects.filter(id=shop_id).first()})
+        return initial
+
+    def form_valid(self, form):
+        product_item = form.cleaned_data.get('product_item')
+        shops = form.cleaned_data.get('shops').first()
+
+        if ProductShopItem.objects.filter(product_item=product_item).filter(shops=shops).exists():
+            form.errors.update({'my_error': True})
+            return super().form_invalid(form)
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['shop_id'] = self.kwargs.get('pk')
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('shop-detail', kwargs={'pk': self.kwargs.get('pk')})
