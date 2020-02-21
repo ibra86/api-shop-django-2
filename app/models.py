@@ -41,7 +41,7 @@ class ProductShopItem(Model):
 class Basket(Model):
     user = ForeignKey(CustomUser, on_delete=DO_NOTHING)
     item = ManyToManyField(Product, blank=True, default=None)
-    quantity = IntegerField(default=0)
+    quantity = PositiveIntegerField(default=1)
 
     @property
     def get_quantity_value(self):

@@ -15,6 +15,5 @@
         {{ form.as_p }}
         <button type="submit">Add</button>
     </form>
-{#    {{ object }}#}
-    <div><a href="{% url 'shop-detail' pk=shop_id%}">Go back to shop {{ shop_id }}</a></div>
+    <div><a href="{% url 'shop-detail' pk=shop_id %}">Go back to shop {{ shop_id }}</a></div>
 {% endblock %}

@@ -3,10 +3,12 @@
 {% block title %}Shops{% endblock %}
 
 {% block content %}
-    <p>{{ object.id }} -- {{ object }}</p>
+    <p>{{ shop.id }} -- {{ shop }}</p>
     {% for product_item in product_shop_items %}
         <li>
             {{ product_item }}
+            --
+            <a href="{% url 'basket-add' %}?shop_id={{shop.id}}&product_shop_item_id={{product_item.id}}">Add to basket</a>
         </li>
     {% empty %}
         No products in the shop yet

@@ -15,4 +15,7 @@ update INSTALLED_APPS with module containing models
 #quick check status of the resource
 curl -s -o /dev/null -w "%{http_code}\n" localhost:8000
 
+TODO:
+- delete ProductShopItemCreateForm
+- add ?shop_id=1 (?)
 

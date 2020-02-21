@@ -8,9 +8,3 @@ class ProductShopItemCreateForm(ModelForm):
         model = ProductShopItem
         fields = '__all__'
 
-    # def is_valid(self):
-    #     # product_item = self.cleaned_data.get('product_item')
-    #     # shops = self.cleaned_data.get('shops')
-    #     # self.Meta.model.objects.all()
-    #     return super().is_valid()
-
