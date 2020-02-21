@@ -1,5 +1,6 @@
 # Create your views here.
 from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
@@ -88,12 +89,23 @@ class ProductShopItemCreateView(CreateView):
     def form_valid(self, form):
         product_item = form.cleaned_data.get('product_item')
         shops = form.cleaned_data.get('shops').first()
+        quantity = form.cleaned_data.get('quantity')
 
-        if ProductShopItem.objects.filter(product_item=product_item).filter(shops=shops).exists():
-            form.errors.update({'my_error': True})
-            return super().form_invalid(form)
+        shop_id = self.kwargs.get('pk')
+        obj = ProductShopItem.objects.filter(shops__id=shop_id).filter(product_item=product_item)
+        if not obj.exists():
+            return super().form_valid(form)
 
-        return super().form_valid(form)
+        quantity += obj.first().quantity
+        obj.update(quantity=quantity)
+        return HttpResponseRedirect(self.get_success_url())
+
+            # obj
+        # if ProductShopItem.objects.filter(product_item=product_item).filter(shops=shops).exists():
+        #     form.errors.update({'my_error': True})
+        # return super().form_invalid(form)
+
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
