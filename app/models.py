@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db.models import Model, CharField, DecimalField, DO_NOTHING, TextField, ManyToManyField, \
-    ForeignKey, IntegerField, PositiveIntegerField
+    ForeignKey, IntegerField, PositiveIntegerField, CASCADE
 
 from users.models import CustomUser
 
@@ -23,14 +23,15 @@ class Product(Model):
     price = DecimalField(max_digits=6, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     category = CharField(max_length=MAX_NAME_LENGTH, blank=True)
     description = TextField(blank=True)
+    shops = ManyToManyField(Shop, through='ProductShopItem')
 
     def __str__(self):
         return f'Product[{self.name} ({self.category}) - {self.price}]$'
 
 
 class ProductShopItem(Model):
-    product_item = ForeignKey(Product, on_delete=DO_NOTHING)
-    shops = ManyToManyField(Shop)
+    product_item = ForeignKey(Product, on_delete=CASCADE)
+    shops = ForeignKey(Shop, on_delete=CASCADE)
     quantity = PositiveIntegerField(default=1)
 
     def __str__(self):
@@ -40,8 +41,7 @@ class ProductShopItem(Model):
 
 class Basket(Model):
     user = ForeignKey(CustomUser, on_delete=DO_NOTHING)
-    item = ManyToManyField(Product, blank=True, default=None)
-    quantity = PositiveIntegerField(default=1)
+    item = ManyToManyField(ProductShopItem, blank=True, default=None)
 
     @property
     def get_quantity_value(self):
@@ -49,3 +49,7 @@ class Basket(Model):
 
     def __str__(self):
         return f'Basket - {self.get_quantity_value} items'
+
+# class BasketItem(Model):
+#
+#     quantity = PositiveIntegerField(default=1)

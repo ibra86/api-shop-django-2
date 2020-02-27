@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm buying{% endblock %}
+
+{% block content %}
+
+    <div class="row py-5 p-4 bg-white rounded shadow-sm">
+        <div class="col-lg-6">
+            <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">
+                Confirm buying
+            </div>
+            <div class="p-4">
+                <p class="font-italic mb-4">
+                    It is the confirmation that you do buy the products.
+                </p>
+                <ul class="list-unstyled mb-4">
+                    <li class="d-flex justify-content-between py-3 border-bottom">
+                        <strong class="text-muted">Total price</strong>
+                        <h5 class="font-weight-bold">$400.00</h5>
+                    </li>
+                </ul>
+                <a href="{% url 'buy-accepted' %}" class="btn btn-dark rounded-pill py-2 btn-block">Buy</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

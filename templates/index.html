@@ -6,9 +6,14 @@
 
 {% block content %}
     {% if user.is_authenticated %}
+        <div class="md-form mt-0">
+            <input class="form-control" type="text" placeholder="Find product" aria-label="Search">
+        </div>
+
         <div><a href="{% url 'shop-list' %}">Shops</a></div>
         <div><a href="{% url 'product-list' %}">Products</a></div>
-        <div><a href="{% url 'basket-list' %}">Basket: {{basket.get_quantity_value}} items</a></div>
+        {#        TODO move to navbar#}
+        {#        <div><a href="{% url 'basket-list' %}">Basket: {{basket.get_quantity_value}} items</a></div>#}
     {% else %}
         <p>You are not logged in</p>
     {% endif %}

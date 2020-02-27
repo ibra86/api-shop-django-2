@@ -50,6 +50,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.context_processor.basket_init'
             ],
         },
     },
@@ -109,3 +110,12 @@ LOGIN_URL = '/users/login/'
 
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ibra.django.python@gmail.com'
+EMAIL_HOST_PASSWORD = '21UovaFritte'
+EMAIL_SUBJECT_PREFIX = '[Django]'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
