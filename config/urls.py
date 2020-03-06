@@ -4,10 +4,8 @@ from django.urls import path, include
 
 from config import settings
 
-static_patterns = static(settings.MEDIA_URL,
-                         document_root=settings.MEDIA_ROOT) + \
-                  static(settings.STATIC_URL,
-                         document_root=settings.STATIC_ROOT)
+static_patterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + \
+                  static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns = [
                   path('', include('app.urls')),
