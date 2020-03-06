@@ -1,13 +1,14 @@
 # Create your views here.
 from django.contrib.auth.decorators import permission_required
+from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 
 from app.forms import ProductShopItemCreateForm
-from app.models import Basket, Shop, Product, ProductShopItem
-from app.utils import send_email_buying_confirmation
+from app.models import Basket, Shop, Product, ProductShopItem, BasketItem
+from app.services.email_service import send_email_buying_confirmation
 
 
 class IndexView(TemplateView):
@@ -27,7 +28,8 @@ class ShopDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['product_shop_items'] = ProductShopItem.objects.filter(shops__id=self.kwargs.get('pk'))
+        pk = self.kwargs.get('pk')
+        context['product_shop_items'] = Shop.objects.get(pk=pk).productshopitem_set.all()
         return context
 
 
@@ -66,15 +68,15 @@ class ProductShopItemCreateView(CreateView):
     def get_initial(self):
         initial = super().get_initial()
         shop_id = self.kwargs.get('pk')
-        initial.update({'shops': Shop.objects.filter(id=shop_id).first()})
+        initial.update({'shop': Shop.objects.filter(id=shop_id).first()})
         return initial
 
     def form_valid(self, form):
-        product_item = form.cleaned_data.get('product_item')
+        product = form.cleaned_data.get('product')
         quantity = form.cleaned_data.get('quantity')
 
         shop_id = self.kwargs.get('pk')
-        obj = ProductShopItem.objects.filter(shops__id=shop_id).filter(product_item=product_item)
+        obj = ProductShopItem.objects.filter(shops__id=shop_id).filter(product=product)
         if not obj.exists():
             return super().form_valid(form)
 
@@ -92,27 +94,33 @@ class ProductShopItemCreateView(CreateView):
 
 
 class BasketCreateView(CreateView):
-    model = Basket
+    model = BasketItem
     fields = ('quantity',)
     template_name = 'basket_add.html'
 
     def form_valid(self, form):
-        user = self.request.user
-        product_shop_item_id = self.request.GET.get('product_shop_item_id')
-        item = ProductShopItem.objects.get(id=product_shop_item_id)
-        quantity = form.instance.quantity
+        get_user = self.request.user
+        get_product_shop_item_id = self.request.GET.get('product_shop_item_id')
+        get_quantity = form.instance.quantity
 
-        obj = Basket.objects.filter(user=user).filter(item=item)
+        product_shop_item_quantity = ProductShopItem.objects.get(id=get_product_shop_item_id).quantity
+        if product_shop_item_quantity <= get_quantity:
+            return super().form_invalid(form)
 
-        if not obj.exists():
-            basket = form.save(commit=False)
-            basket.user = user
-            basket.save()
-            basket.item.add(item)
-            return super().form_valid(form)
+        objs = BasketItem.objects.filter(product_shop_item=get_product_shop_item_id)
 
-        quantity += obj.first().quantity
-        obj.update(quantity=quantity)
+        if objs.exists():
+            objs.update(quantity=F('quantity') + get_quantity)
+        else:
+            basket_item = BasketItem(
+                basket=Basket.objects.get(user=get_user),
+                product_shop_item=ProductShopItem.objects.get(id=get_product_shop_item_id),
+                quantity=get_quantity
+            )
+            basket_item.save()
+
+        ProductShopItem.objects.filter(id=get_product_shop_item_id).update(quantity=F('quantity') - get_quantity)
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -121,20 +129,28 @@ class BasketCreateView(CreateView):
 
 class BasketListView(ListView):
     template_name = 'basket_list.html'
-    context_object_name = 'basket_list'
-    model = Basket
+    context_object_name = 'basket_items'
+    model = BasketItem
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        return super().get_context_data()
+        context = super().get_context_data(**kwargs)
+        context['basket_total_price'] = Basket.objects.get(user=self.request.user).total_price
+        return context
 
 
 class BuyConfirmTemplateView(TemplateView):
     template_name = 'buy_confirm.html'
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['basket_total_price'] = Basket.objects.get(user=self.request.user).total_price
+        return context
+
 
 class BuyAcceptedTemplateView(TemplateView):
     template_name = 'buy_accepted.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs): # TODO change method for more appropriate
         send_email_buying_confirmation()
+        BasketItem.objects.filter(basket__user=self.request.user).delete()
         return super().get_context_data(**kwargs)

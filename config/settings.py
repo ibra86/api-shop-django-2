@@ -48,6 +48,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'app.context_processor.basket_init'
@@ -103,6 +104,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR + '/static'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR + '/media'
 
 AUTH_USER_MODEL = 'users.CustomUser'  # new
 
@@ -111,10 +116,9 @@ LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
 
-
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'ibra.django.python@gmail.com'
-EMAIL_HOST_PASSWORD = '21UovaFritte'
+EMAIL_HOST_PASSWORD = '...'  # TODO enc password
 EMAIL_SUBJECT_PREFIX = '[Django]'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

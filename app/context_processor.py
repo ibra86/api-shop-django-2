@@ -4,9 +4,11 @@ from app.models import Basket
 
 
 def basket_init(request):
-    basket_items = None
+    b = None
     if request.user.is_authenticated:
         user = request.user
-        basket_items = Basket.objects.filter(user=user).aggregate(Sum('quantity')).get('quantity__sum')
-    basket_items = int(0 if basket_items is None else basket_items)
-    return {"basket_items": basket_items}
+        b = Basket.objects.get_or_create(user=user)[0]
+        b = b.basketitem_set.aggregate(Sum('quantity'))
+        b = b.get('quantity__sum')
+    basket_items_total = int(0 if b is None else b)
+    return {"basket_items_total": basket_items_total}
